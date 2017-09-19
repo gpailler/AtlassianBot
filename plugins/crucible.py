@@ -37,7 +37,7 @@ class CrucibleBot(object):
                 self.__cache.AddToCache(self.__get_cachekey(reviewid, message))
 
                 try:
-                    msg = self.__get_review_message(reviewid)
+                    msg = self.__get_review_message(reviewid, message._client)
                     if msg is None:
                         msg = self.__get_reviewnotfound_message(reviewid)
 
@@ -61,7 +61,7 @@ class CrucibleBot(object):
         else:
             request.raise_for_status()
 
-    def __get_review_message(self, reviewid):
+    def __get_review_message(self, reviewid, client):
         review = self.__get_review(reviewid)
         if review:
             reviewurl = '{}/cru/{}'.format(
@@ -83,7 +83,7 @@ class CrucibleBot(object):
                 'fields': [],
             }
 
-            uncompleted_reviewers = self.__get_uncompleted_reviewers(reviewid)
+            uncompleted_reviewers = self.__get_uncompleted_reviewers(reviewid, client)
             if uncompleted_reviewers:
                 attachment['fallback'] = attachment['fallback'] + \
                     '\nUncompleted reviewers: {}'.format(
@@ -112,14 +112,14 @@ class CrucibleBot(object):
         elif request.status_code != 404:
             request.raise_for_status()
 
-    def __get_uncompleted_reviewers(self, reviewid):
+    def __get_uncompleted_reviewers(self, reviewid, client):
         request = rest.get(
             self.__server,
             '/rest-service/reviews-v1/{id}/reviewers/uncompleted'
             .format(id=reviewid))
 
         reviewers = request.json()['reviewer']
-        return ['<@{}>'.format(r['userName']) for r in reviewers]
+        return ['<@{}>'.format(client.find_user_by_name(r['userName'])) for r in reviewers]
 
     def __get_cachekey(self, reviewId, message):
         return reviewId + message.body['channel']
