@@ -7,6 +7,8 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from slackbot.bot import Bot
 
+from utils import slackbot_utils
+
 logger = logging.getLogger(__name__)
 
 MAX_NOTIFIERS_WORKERS = 2
@@ -17,7 +19,7 @@ class NotifierBot(object):
         logger.info('registered %s', self.__class__.__name__)
 
         if slackclient is None:
-            slackclient = self.__get_slackclient()
+            slackclient = slackbot_utils.get_slackclient()
         self.__slackclient = slackclient
 
         if self.__slackclient is None:
@@ -34,14 +36,6 @@ class NotifierBot(object):
 
     def submit(self, job):
         job._init_threaded(self.executor, self.__slackclient)
-
-    def __get_slackclient(self):
-        stack = inspect.stack()
-        for frame in [f[0] for f in stack]:
-            if 'self' in frame.f_locals:
-                instance = frame.f_locals['self']
-                if isinstance(instance, Bot):
-                    return instance._client
 
 
 class NotifierJob(object):

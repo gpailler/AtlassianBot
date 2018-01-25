@@ -8,8 +8,9 @@ from itertools import filterfalse
 from slackbot.bot import listen_to
 from slackbot.bot import respond_to
 
+from utils import slackbot_utils
 from . import settings
-import utils.rest as rest
+from utils import rest
 from utils.messages_cache import MessagesCache
 
 
