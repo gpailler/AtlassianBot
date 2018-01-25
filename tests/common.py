@@ -26,7 +26,7 @@ class controlled_responses(object):
     def __exit__(self, type, value, traceback):
         if self.server:
             self.__validate_auth_header()
-        self.rsps.__exit__()
+        self.rsps.__exit__(type, value, traceback)
 
     @property
     def calls(self):

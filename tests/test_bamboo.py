@@ -130,7 +130,7 @@ def test_move_deployment(bot, testdata):
         [msg.send_webapi.assert_any_call(x, attachments=None, as_user=True) for x in testdata['result']]
 
 @pytest.mark.parametrize('code,status,exception,errmsg', [
-    (403, 'OK', requests.exceptions.HTTPError, '403 Client Error: None for url: http://host/build/admin/ajax/reorderBuild.action'),
+    (403, 'OK', requests.exceptions.HTTPError, '403 Client Error: Forbidden for url: http://host/build/admin/ajax/reorderBuild.action'),
     (500, 'OK', Exception, 'Not authorized'),
     (200, 'KO', Exception, 'Unknown error')
 ])

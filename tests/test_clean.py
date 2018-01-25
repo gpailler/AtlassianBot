@@ -18,6 +18,8 @@ logging.basicConfig(level=logging.DEBUG)
 with open('tests/test_clean_data.json') as data_file:
     data = json.load(data_file)
 
+with open('tests/test_jira_data.json') as jira_data_file:
+    jira_data = json.load(jira_data_file)
 
 def get_message_with_user(input):
     msg = get_message(input)
@@ -103,7 +105,7 @@ def test_get_username(bot, id, result, exception):
 def test_generate_clean_tasks(bot, input, testdata):
     msg = get_message_with_user(input)
 
-    with controlled_responses(testdata['requests']):
+    with controlled_responses(jira_data['jira_default_field_query'] + testdata['requests']):
 
         bot.generate_clean_tasks(msg, input)
 

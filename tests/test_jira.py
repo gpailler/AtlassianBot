@@ -56,7 +56,7 @@ def test_jirapattern(bot, input, expected):
                          ('JIRA-3', data['jirabot_notexist']),
                          ])
 def test_display_issues(bot, input, testdata):
-    with controlled_responses(testdata['requests']):
+    with controlled_responses(data['jira_default_field_query'] + testdata['requests']) as rsps:
         message = get_message(input)
 
         bot.display_issues(message)
@@ -72,7 +72,7 @@ def test_display_issues(bot, input, testdata):
                          ('JIRA-3', data['jirabot_notexist']),
                          ])
 def test_messages_cache(bot, input, testdata):
-    with controlled_responses(testdata['requests']):
+    with controlled_responses(data['jira_default_field_query'] + testdata['requests']):
         # First call should display message
         message = get_message(input, channel='channel1')
         bot.display_issues(message)
@@ -91,7 +91,7 @@ def test_messages_cache(bot, input, testdata):
 
 
 def test_wrong_auth(bot):
-    with controlled_responses() as rsps:
+    with controlled_responses(data['jira_default_field_query']) as rsps:
         rsps.rsps.add(
             responses.GET,
             'http://host/rest/api/2/issue/JIRA-1',
@@ -129,7 +129,7 @@ def test_notifier(testdata):
         ]
     }
 
-    with controlled_responses(testdata['requests'][1:]) as rsps:
+    with controlled_responses(data['jira_default_field_query'] + testdata['requests'][1:]) as rsps:
         rsps.rsps.add(
             responses.GET,
             re.compile(r'http?://host/rest/api/2/search.+'),
