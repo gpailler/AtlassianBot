@@ -20,11 +20,8 @@ prefixes = ['CRUA', 'CRUB']
 
 @pytest.fixture
 def bot():
-    def side_effect(username):
-        return username
-    
     slack_mock = MagicMock()
-    slack_mock.find_user_by_name = MagicMock(side_effect=side_effect)
+    slack_mock.find_user_by_name = MagicMock(side_effect=lambda x: x)
 
     cruciblebot = CrucibleBot(MessagesCache(), server, prefixes, slack_mock)
     return cruciblebot

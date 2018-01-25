@@ -115,6 +115,7 @@ def test_wrong_auth(bot):
                          ])
 def test_notifier(testdata):
     slack_mock = MagicMock()
+    slack_mock.find_user_by_name = MagicMock(side_effect=lambda x: x)
     slack_mock.channels = {'channel_id': {'name': 'atlassianbot-test'}}
     slack_mock.send_message = MagicMock()
 

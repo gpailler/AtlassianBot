@@ -270,7 +270,8 @@ class JiraNotifierJob(NotifierJob):
             else:
                 author = issue.fields.assignee.name
 
-            return '<@{}>'.format(author)
+        user_id = self._slackclient.find_user_by_name(author)
+        return '<@{}>'.format(user_id) if user_id else '@{}'.format(author)
 
     def __get_status(self, issue):
         if len(issue.changelog.histories) > 0:

@@ -72,7 +72,7 @@ class NotifierJob(object):
 
     def _init_threaded(self, executor, slackclient):
         self.__executor = executor
-        self.__slackclient = slackclient
+        self._slackclient = slackclient
         self.__channel_id = self.__get_channel(self.channel)
         if self.__channel_id is None:
             logger.error('Unable to find channel')
@@ -83,7 +83,7 @@ class NotifierJob(object):
             .add_done_callback(self.__run_async)
 
     def __get_channel(self, channelname):
-        for id, channel in list(self.__slackclient.channels.items()):
+        for id, channel in list(self._slackclient.channels.items()):
             if channel.get('name', None) == channelname:
                 return id
 
@@ -96,7 +96,7 @@ class NotifierJob(object):
         """Method that should do something."""
 
     def send_message(self, attachments):
-        self.__slackclient.send_message(
+        self._slackclient.send_message(
                 self.__channel_id,
                 '',
                 attachments=json.dumps(attachments))
