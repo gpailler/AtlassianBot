@@ -1,4 +1,13 @@
 {
+  "jira_default_field_query":
+  [
+    {
+      "url": "http://host/rest/api/2/field",
+      "code": 200,
+      "content_type": "application/json",
+      "text": []
+    }
+  ],
   "jirabot_result":
   {
     "requests":
