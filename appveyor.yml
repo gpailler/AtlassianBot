@@ -5,14 +5,14 @@ environment:
     - PYTHON: "C:\\Python34"
       PYTHON_VERSION: "Python 3.4 x86"
       IMAGEMAGICK_PLATFORM: "--x86"
-    - PYTHON: "C:\\Python35"
-      PYTHON_VERSION: "Python 3.5 x86"
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "Python 3.6 x86"
       IMAGEMAGICK_PLATFORM: "--x86"
     - PYTHON: "C:\\Python34-x64"
       PYTHON_VERSION: "Python 3.4 x64"
       DISTUTILS_USE_SDK: "1"
-    - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "Python 3.5 x64"
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "Python 3.6 x64"
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"

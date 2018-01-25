@@ -12,7 +12,7 @@ Atlassian Bot is a collection of plugins to integrate Atlassian tools into Slack
 > cd AtlassianBot
 
 > pip install virtualenv
-> virtualenv venv --python=python3.4
+> virtualenv venv --python=python3.6
 > source venv/bin/activate
 
 > pip install -r requirements.txt
