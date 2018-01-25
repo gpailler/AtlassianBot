@@ -1,4 +1,4 @@
-jira==1.0.3
+jira>=1.0.3
 slackbot>=0.2.0
 GitPython>=1.0.0
 arrow>=0.5.4
