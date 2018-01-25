@@ -15,12 +15,12 @@ from utils.messages_cache import MessagesCache
 
 
 class CrucibleBot(object):
-    def __init__(self, cache, server, prefixes):
+    def __init__(self, cache, server, prefixes, slack_client = None):
         self.__cache = cache
         self.__server = server
         self.__prefixes = prefixes
         self.__crucible_regex = re.compile(self.get_pattern(), re.IGNORECASE)
-        self.__slackclient = slackbot_utils.get_slackclient()
+        self.__slackclient = slack_client if slack_client else slackbot_utils.get_slackclient()
 
     def get_pattern(self):
         crucible_prefixes = '|'.join(self.__prefixes)

@@ -3,6 +3,7 @@ import json
 import pytest
 import re
 import requests
+from mock import MagicMock
 
 from .common import get_message, controlled_responses
 from plugins.crucible import CrucibleBot
@@ -19,7 +20,13 @@ prefixes = ['CRUA', 'CRUB']
 
 @pytest.fixture
 def bot():
-    cruciblebot = CrucibleBot(MessagesCache(), server, prefixes)
+    def side_effect(username):
+        return username
+    
+    slack_mock = MagicMock()
+    slack_mock.find_user_by_name = MagicMock(side_effect=side_effect)
+
+    cruciblebot = CrucibleBot(MessagesCache(), server, prefixes, slack_mock)
     return cruciblebot
 
 

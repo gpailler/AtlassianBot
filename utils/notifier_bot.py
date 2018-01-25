@@ -18,9 +18,7 @@ class NotifierBot(object):
     def __init__(self, slackclient=None):
         logger.info('registered %s', self.__class__.__name__)
 
-        if slackclient is None:
-            slackclient = slackbot_utils.get_slackclient()
-        self.__slackclient = slackclient
+        self.__slackclient = slackclient if slackclient else slackbot_utils.get_slackclient()
 
         if self.__slackclient is None:
             logger.error('Unable to retrieve slackclient instance')
