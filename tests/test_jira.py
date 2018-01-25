@@ -14,18 +14,26 @@ from utils.messages_cache import MessagesCache
 with open('tests/test_jira_data.json') as data_file:
     data = json.load(data_file)
 
-server = {
+jira_server = {
     'host': 'http://host',
     'username': 'user',
-    'password': 'pass',
-    'imageproxy': 'http://imageproxy'
+    'password': 'pass'
     }
+
+imageproxy_server = {
+    'host': 'http://imageproxy'
+    }
+
 prefixes = ['JIRA', 'JIRB']
 
 
 @pytest.fixture
 def bot():
-    jiraBot = JiraBot(MessagesCache(), server, prefixes)
+    jiraBot = JiraBot(
+                      MessagesCache(),
+                      jira_server,
+                      imageproxy_server,
+                      prefixes)
     return jiraBot
 
 
@@ -144,7 +152,7 @@ def test_notifier(testdata):
             body=json.dumps(testdata['requests'][0]['text']),
             content_type='application/json')
 
-        with JiraNotifierBot(server, conf, slack_mock) as obj:
+        with JiraNotifierBot(jira_server, imageproxy_server, conf, slack_mock) as obj:
             assert len(obj._jobs) == 1
             event = Event()
 
