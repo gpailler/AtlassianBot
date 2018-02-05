@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import requests
 from utils import rest
 
 
@@ -39,7 +40,7 @@ class Stash(object):
             }
 
             request = rest.get(self.__server, path, data)
-            if request.status_code != 200:
+            if request.status_code != requests.codes.ok:
                 raise Exception(request.text)
             else:
                 if request.json()['size'] == 0:
@@ -57,5 +58,5 @@ class Stash(object):
         }
 
         request = rest.delete(self.__server, path, data)
-        if request.status_code != 204:
+        if request.status_code != requests.codes.no_content:
             raise Exception(request.text)

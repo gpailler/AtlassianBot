@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import logging
 import re
 import requests
 
@@ -8,10 +9,12 @@ from slackbot.bot import respond_to
 from . import settings
 from utils import rest
 
+logger = logging.getLogger(__name__)
+
 
 class BambooBot(object):
-    def __init__(self, server, prefixes):
-        self.__server = server
+    def __init__(self, bamboo_server, prefixes):
+        self.__bamboo_server = bamboo_server
         self.__prefixes = prefixes
 
     def get_pattern(self):
@@ -58,7 +61,7 @@ class BambooBot(object):
 
     def __move_top(self, resultkey, type):
         request = rest.post(
-            self.__server,
+            self.__bamboo_server,
             '/build/admin/ajax/reorderBuild.action',
             data={
                 'resultKey': resultkey,
@@ -84,7 +87,7 @@ class BambooBot(object):
 
     def __plan_exist(self, plankey):
         request = rest.get(
-            self.__server,
+            self.__bamboo_server,
             '/rest/api/latest/plan/{}'.format(plankey))
         if request.status_code == requests.codes.ok:
             return True
@@ -95,7 +98,7 @@ class BambooBot(object):
 
     def __get_deployment_key(self, deploymentid):
         request = rest.get(
-            self.__server,
+            self.__bamboo_server,
             '/rest/api/latest/deploy/result/{}'.format(deploymentid))
         if request.status_code == requests.codes.ok:
             return request.json()['key']['key']
@@ -106,7 +109,7 @@ class BambooBot(object):
 
     def find_matching_branches(self, plankey, searched_term):
         request = rest.get(
-            self.__server,
+            self.__bamboo_server,
             '/rest/api/latest/search/branches',
             data={
                 'masterPlanKey': plankey,
@@ -120,9 +123,8 @@ class BambooBot(object):
         for result in request.json()['searchResults']:
             result = result['searchEntity']
             yield (result['id'],
-                   '{}/{}'.format(
-                        result['planName'],
-                        result['branchName']))
+                   '{}/{}'.format(result['planName'],
+                                  result['branchName']))
 
     def remove_branch(self, plankey):
         request = rest.post(
@@ -147,7 +149,7 @@ class BambooBot(object):
 
     def __get_builds(self):
         request = rest.get(
-            self.__server,
+            self.__bamboo_server,
             '/build/admin/ajax/getDashboardSummary.action')
         if request.status_code == requests.codes.ok:
             return request.json()['builds']
