@@ -7,7 +7,7 @@ import requests
 from slackbot.bot import respond_to
 
 from . import settings
-import utils.rest as rest
+from utils import rest
 
 logger = logging.getLogger(__name__)
 

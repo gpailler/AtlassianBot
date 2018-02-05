@@ -1,7 +1,7 @@
 # coding: utf-8
 
 import requests
-import utils.rest as rest
+from utils import rest
 
 
 class Stash(object):

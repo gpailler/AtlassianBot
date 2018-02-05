@@ -7,6 +7,8 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from slackbot.bot import Bot
 
+from utils import slackbot_utils
+
 logger = logging.getLogger(__name__)
 
 MAX_NOTIFIERS_WORKERS = 2
@@ -16,9 +18,7 @@ class NotifierBot(object):
     def __init__(self, slackclient=None):
         logger.info('registered %s', self.__class__.__name__)
 
-        if slackclient is None:
-            slackclient = self.__get_slackclient()
-        self.__slackclient = slackclient
+        self.__slackclient = slackclient if slackclient else slackbot_utils.get_slackclient()
 
         if self.__slackclient is None:
             logger.error('Unable to retrieve slackclient instance')
@@ -34,14 +34,6 @@ class NotifierBot(object):
 
     def submit(self, job):
         job._init_threaded(self.executor, self.__slackclient)
-
-    def __get_slackclient(self):
-        stack = inspect.stack()
-        for frame in [f[0] for f in stack]:
-            if 'self' in frame.f_locals:
-                instance = frame.f_locals['self']
-                if isinstance(instance, Bot):
-                    return instance._client
 
 
 class NotifierJob(object):
@@ -80,7 +72,7 @@ class NotifierJob(object):
 
     def _init_threaded(self, executor, slackclient):
         self.__executor = executor
-        self.__slackclient = slackclient
+        self._slackclient = slackclient
         self.__channel_id = self.__get_channel(self.channel)
         if self.__channel_id is None:
             logger.error('Unable to find channel')
@@ -91,7 +83,7 @@ class NotifierJob(object):
             .add_done_callback(self.__run_async)
 
     def __get_channel(self, channelname):
-        for id, channel in list(self.__slackclient.channels.items()):
+        for id, channel in list(self._slackclient.channels.items()):
             if channel.get('name', None) == channelname:
                 return id
 
@@ -104,7 +96,7 @@ class NotifierJob(object):
         """Method that should do something."""
 
     def send_message(self, attachments):
-        self.__slackclient.send_message(
+        self._slackclient.send_message(
                 self.__channel_id,
                 '',
                 attachments=json.dumps(attachments))

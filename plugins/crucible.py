@@ -8,17 +8,19 @@ from itertools import filterfalse
 from slackbot.bot import listen_to
 from slackbot.bot import respond_to
 
+from utils import slackbot_utils
 from . import settings
-import utils.rest as rest
+from utils import rest
 from utils.messages_cache import MessagesCache
 
 
 class CrucibleBot(object):
-    def __init__(self, cache, server, prefixes):
+    def __init__(self, cache, server, prefixes, slack_client = None):
         self.__cache = cache
         self.__server = server
         self.__prefixes = prefixes
         self.__crucible_regex = re.compile(self.get_pattern(), re.IGNORECASE)
+        self.__slackclient = slack_client if slack_client else slackbot_utils.get_slackclient()
 
     def get_pattern(self):
         crucible_prefixes = '|'.join(self.__prefixes)
@@ -83,7 +85,7 @@ class CrucibleBot(object):
                 'fields': [],
             }
 
-            uncompleted_reviewers = self.__get_uncompleted_reviewers(reviewid)
+            uncompleted_reviewers = list(self.__get_uncompleted_reviewers(reviewid))
             if uncompleted_reviewers:
                 attachment['fallback'] = attachment['fallback'] + \
                     '\nUncompleted reviewers: {}'.format(
@@ -119,7 +121,9 @@ class CrucibleBot(object):
             .format(id=reviewid))
 
         reviewers = request.json()['reviewer']
-        return ['<@{}>'.format(r['userName']) for r in reviewers]
+        for r in reviewers:
+            user_id = self.__slackclient.find_user_by_name(r['userName'])
+            yield '<@{}>'.format(user_id) if user_id else '@{}'.format(r['userName'])
 
     def __get_cachekey(self, reviewId, message):
         return reviewId + message.body['channel']

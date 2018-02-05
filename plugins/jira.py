@@ -281,7 +281,8 @@ class JiraNotifierJob(NotifierJob):
             else:
                 author = issue.fields.assignee.name
 
-            return '<@{}>'.format(author)
+        user_id = self._slackclient.find_user_by_name(author)
+        return '<@{}>'.format(user_id) if user_id else '@{}'.format(author)
 
     def __get_status(self, issue):
         if len(issue.changelog.histories) > 0:
@@ -292,14 +293,6 @@ class JiraNotifierJob(NotifierJob):
 
     def __formatvalue(self, value):
         return value if value else 'N/A'
-
-    def __get_slackclient(self):
-        stack = inspect.stack()
-        for frame in [f[0] for f in stack]:
-            if 'self' in frame.f_locals:
-                instance = frame.f_locals['self']
-                if isinstance(instance, Bot):
-                    return instance._client
 
     def __get_channel(self, channelname):
         for id, channel in list(self.slackclient.channels.items()):
