@@ -42,12 +42,6 @@ servers:
     username: &default_username username
     password: &default_password password
 
-    # Image proxy server is used to display issue type icons on Slack
-    # This server has two purpose:
-    # - Slack requires a public image URL and your Jira server can be private
-    # - Some icon use SVG format and Slack doesn't support it
-    imageproxy: https://atlassianbot.pythonanywhere.com
-
   bamboo:
     # Must have permissons to move jobs on the build queue
     host: https://server
@@ -64,3 +58,10 @@ servers:
     host: https://server
     username: *default_username
     password: *default_password
+
+  imageproxy:
+    # Image proxy server is used to display issue type icons on Slack
+    # This server has two purpose:
+    # - Slack requires a public image URL and your Jira server can be private
+    # - Some icon use SVG format and Slack doesn't support it
+    host: https://atlassianbot.pythonanywhere.com

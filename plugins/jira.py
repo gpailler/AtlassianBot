@@ -15,8 +15,9 @@ from slackbot.bot import Bot, listen_to, respond_to
 
 from . import settings
 from utils.messages_cache import MessagesCache
-from utils.imageproxy import convert_proxyurl
+from utils.imageproxy import converturl_proxyurl
 from utils.notifier_bot import NotifierBot, NotifierJob
+
 logger = logging.getLogger(__name__)
 
 MAX_NOTIFIERS_WORKERS = 2
@@ -38,18 +39,22 @@ def get_Jira_instance(server):
 
 
 class JiraBot(object):
-    def __init__(self, cache, server, prefixes):
+    def __init__(self, cache, jira_server, imageproxy_server, prefixes):
         self.__cache = cache
-        self.__server = server
+        self.__jira_server = jira_server
+        self.__imageproxy_server = imageproxy_server
         self.__prefixes = prefixes
         self.__jira_regex = re.compile(self.get_pattern(), re.IGNORECASE)
 
     @lazy
     def __jira(self):
-        return get_Jira_instance(self.__server)
+        return get_Jira_instance(self.__jira_server)
 
-    def get_pattern(self):
-        jira_prefixes = '|'.join(self.__prefixes)
+    def get_pattern(self, prefixes=None):
+        if prefixes is None:
+            prefixes = self.__prefixes
+
+        jira_prefixes = '|'.join(prefixes)
         return r'(?:^|\s|[\W]+)(?<!CLEAN\s)((?:{})-[\d]+)(?:$|\s|[\W]+)'\
             .format(jira_prefixes)
 
@@ -105,8 +110,8 @@ class JiraBot(object):
     def get_issue_message(self, key):
         try:
             issue = self.__jira.issue(key, fields='summary,issuetype')
-            icon = convert_proxyurl(
-                                    self.__server['imageproxy'],
+            icon = converturl_proxyurl(
+                                    self.__imageproxy_server['host'],
                                     issue.fields.issuetype.iconUrl)
             summary = issue.fields.summary.encode('utf8')
             return {
@@ -145,10 +150,15 @@ class JiraBot(object):
 
 
 class JiraNotifierBot(NotifierBot):
-    def __init__(self, server, config, slackclient=None):
+    def __init__(self,
+                 jira_server,
+                 imageproxy_server,
+                 config,
+                 slackclient=None):
         super().__init__(slackclient)
 
-        self.__server = server
+        self.__jira_server = jira_server
+        self.__imageproxy_server = imageproxy_server
         self._jobs = list(self.submit_jobs(config))
 
     def submit_jobs(self, config):
@@ -157,17 +167,19 @@ class JiraNotifierBot(NotifierBot):
                         'on channel \'#%s\'',
                         notifier_settings['query'],
                         notifier_settings['channel'])
+
             job = JiraNotifierJob(
                                   self.__jira,
-                                  self.__server['imageproxy'],
+                                  self.__imageproxy_server,
                                   notifier_settings,
                                   config['polling_interval'])
+
             self.submit(job)
             yield job
 
     @lazy
     def __jira(self):
-        return get_Jira_instance(self.__server)
+        return get_Jira_instance(self.__jira_server)
 
 
 class JiraNotifierJob(NotifierJob):
@@ -191,7 +203,6 @@ class JiraNotifierJob(NotifierJob):
         self.__last_result = results[0]
 
     def run(self):
-        logger.info('run')
         # Convert last issue update date
         # to a compatible timestamp for Jira
         date = arrow.get(self.__last_result.fields.updated)
@@ -212,8 +223,8 @@ class JiraNotifierJob(NotifierJob):
             attachments = []
             for issue in results[::-1]:
                 summary = issue.fields.summary.encode('utf8')
-                icon = convert_proxyurl(
-                                self.__imageproxy,
+                icon = converturl_proxyurl(
+                                self.__imageproxy['host'],
                                 issue.fields.issuetype.iconUrl)
 
                 sps = self.__get_storypoints(issue)
@@ -297,10 +308,15 @@ class JiraNotifierJob(NotifierJob):
 
 
 if (settings.plugins.jiranotifier.enabled):
-    JiraNotifierBot(settings.servers.jira, settings.plugins.jiranotifier)
+    JiraNotifierBot(
+                    settings.servers.jira,
+                    settings.servers.imageproxy,
+                    settings.plugins.jiranotifier)
 
-instance = JiraBot(MessagesCache(),
+instance = JiraBot(
+                   MessagesCache(),
                    settings.servers.jira,
+                   settings.servers.imageproxy,
                    settings.plugins.jirabot.prefixes)
 
 

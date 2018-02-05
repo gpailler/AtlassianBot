@@ -2,7 +2,7 @@ import requests
 from base64 import b64encode, b64decode
 
 
-def convert_proxyurl(server, url):
+def converturl_proxyurl(server, url):
     icon_request = requests.get(url)
     if icon_request.status_code == requests.codes.ok:
         content_type = icon_request.headers.get('Content-Type')
@@ -12,6 +12,13 @@ def convert_proxyurl(server, url):
         return '%s/image/%s/%s' % (server, content_type, content)
 
     return url
+
+
+def convertdata_proxyurl(server, content_type, data):
+    content_type = __encode(content_type.encode())
+    content = data.replace('+', '-').replace('/', '_')
+
+    return '%s/image/%s/%s' % (server, content_type, content)
 
 
 def decode(content):
