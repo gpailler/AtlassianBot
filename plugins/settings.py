@@ -2,9 +2,10 @@
 
 import os
 import sys
-from configure import Configuration
+import yaml
+from attrdict import AttrMap
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-config = Configuration.from_file(current_dir + '/settings.yml').configure()
-
-sys.modules[__name__] = config
+with open(current_dir + '/settings.yml', 'r') as stream:
+    config = yaml.load(stream)
+    sys.modules[__name__] = AttrMap(config)

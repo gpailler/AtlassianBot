@@ -39,7 +39,7 @@ servers:
   jira:
     host: https://server
     # Remove username and password for anonymous login
-    username: &default_username username
+    username: &default_username usernamewith%
     password: &default_password password
 
   bamboo:

@@ -22,13 +22,13 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Update PIP version
-  - ".\\appveyor\\build.cmd pip install --user --upgrade pip"
+  - ".\\appveyor\\build.cmd python -m pip install --user --upgrade pip"
 
   # Install AtlassianBot requirements
-  - ".\\appveyor\\build.cmd pip install -r requirements.txt"
+  - ".\\appveyor\\build.cmd python -m pip install -r requirements.txt"
 
   # Install CodeCov requirements
-  - "pip install codecov"
+  - "python -m pip install codecov"
 
   # Install ImageMagick
   - choco install imagemagick.app --version 6.9.6.2 -y %IMAGEMAGICK_PLATFORM%
