@@ -125,7 +125,7 @@ class CrucibleBot(object):
         for r in reviewers:
             user_id = self.__slackclient.find_user_by_name(r['userName'])
             if not user_id and self.__handle_field:
-                user_id = slackbot_utils.get_user_by_crucible_handle(self.__slackclient, r['userName'], self.__handle_field)#'XfFY5PR9PE')
+                user_id = slackbot_utils.get_user_by_crucible_handle(self.__slackclient, r['userName'], self.__handle_field)
             yield '<@{}>'.format(user_id) if user_id else '@{}'.format(r['userName'])
 
     def __get_cachekey(self, reviewId, message):
