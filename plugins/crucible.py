@@ -15,10 +15,11 @@ from utils.messages_cache import MessagesCache
 
 
 class CrucibleBot(object):
-    def __init__(self, cache, server, prefixes, slack_client = None):
+    def __init__(self, cache, server, prefixes, handle_field = None, slack_client = None):
         self.__cache = cache
         self.__server = server
         self.__prefixes = prefixes
+        self.__handle_field = handle_field
         self.__crucible_regex = re.compile(self.get_pattern(), re.IGNORECASE)
         self.__slackclient = slack_client if slack_client else slackbot_utils.get_slackclient()
 
@@ -122,7 +123,10 @@ class CrucibleBot(object):
 
         reviewers = request.json()['reviewer']
         for r in reviewers:
+            print('reviewer: {}'.format(r))
             user_id = self.__slackclient.find_user_by_name(r['userName'])
+            if not user_id and self.__handle_field:
+                user_id = slackbot_utils.get_user_by_crucible_handle(self.__slackclient, r['userName'], self.__handle_field)#'XfFY5PR9PE')
             yield '<@{}>'.format(user_id) if user_id else '@{}'.format(r['userName'])
 
     def __get_cachekey(self, reviewId, message):
@@ -131,7 +135,8 @@ class CrucibleBot(object):
 
 instance = CrucibleBot(MessagesCache(),
                        settings.servers.crucible,
-                       settings.plugins.cruciblebot.prefixes)
+                       settings.plugins.cruciblebot.prefixes,
+                       settings.plugins.cruciblebot.handlefield)
 
 
 if (settings.plugins.cruciblebot.enabled):
