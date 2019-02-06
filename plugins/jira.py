@@ -105,7 +105,7 @@ class JiraBot(object):
             attachments.append(issue_message)
 
         if attachments:
-            message.send_webapi('', json.dumps(attachments))
+            message.reply_webapi('', json.dumps(attachments))
 
     def get_issue_message(self, key):
         try:
