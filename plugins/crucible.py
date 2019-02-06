@@ -135,7 +135,7 @@ class CrucibleBot(object):
 instance = CrucibleBot(MessagesCache(),
                        settings.servers.crucible,
                        settings.plugins.cruciblebot.prefixes,
-                       settings.plugins.cruciblebot.handlefield)
+                       handle_field=settings.plugins.cruciblebot.handlefield)
 
 
 if (settings.plugins.cruciblebot.enabled):
