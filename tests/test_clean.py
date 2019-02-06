@@ -7,9 +7,9 @@ from plugins.clean import CleanBot
 from plugins.stash import Stash
 from .common import get_message, controlled_responses
 
-from . import test_jira
-from . import test_bamboo
-from . import test_crucible
+from .test_jira import bot as jira_bot_fixture
+from .test_bamboo import bot as bamboo_bot_fixture
+from .test_crucible import bot as crucible_bot_fixture
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -31,10 +31,10 @@ def get_message_with_user(input):
 
 
 @pytest.fixture
-def bot():
-    jira = test_jira.bot()
-    bamboo = test_bamboo.bot()
-    crucible = test_crucible.bot()
+def bot(jira_bot_fixture, bamboo_bot_fixture, crucible_bot_fixture):
+    jira = jira_bot_fixture
+    bamboo = bamboo_bot_fixture
+    crucible = crucible_bot_fixture
     stash_settings = {'host': 'http://host', 'username': 'u', 'password': 'p'}
     stash = Stash(stash_settings)
 
