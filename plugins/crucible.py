@@ -15,7 +15,7 @@ from utils.messages_cache import MessagesCache
 
 
 class CrucibleBot(object):
-    def __init__(self, cache, server, prefixes, handle_field = None, slack_client = None):
+    def __init__(self, cache, server, prefixes, slack_client = None, handle_field = None):
         self.__cache = cache
         self.__server = server
         self.__prefixes = prefixes
