@@ -58,21 +58,26 @@ def test_jirapattern(bot, input, expected):
         assert result.group(1) == expected
 
 
-@pytest.mark.parametrize('input,testdata', [
-                         ('JIRA-1 & JIRA-2', data['jirabot_result']),
-                         ('JIRA-1 & JIRA-1', data['jirabot_result1']),
-                         ('JIRA-3', data['jirabot_notexist']),
+@pytest.mark.parametrize('input,testdata,thread_ts', [
+                         ('JIRA-1 & JIRA-2', data['jirabot_result'], None),
+                         ('JIRA-1 & JIRA-1', data['jirabot_result1'], None),
+                         ('JIRA-3', data['jirabot_notexist'], None),
+                         ('JIRA-1 & JIRA-2', data['jirabot_result'], 'threadTS'),
+                         ('JIRA-1 & JIRA-1', data['jirabot_result1'], 'threadTS'),
+                         ('JIRA-3', data['jirabot_notexist'], 'threadTS'),
                          ])
-def test_display_issues(bot, input, testdata):
+def test_display_issues(bot, input, testdata, thread_ts):
     with controlled_responses(data['jira_default_field_query'] + testdata['requests']) as rsps:
-        message = get_message(input)
+        message = get_message(input, thread_ts=thread_ts)
 
         bot.display_issues(message)
 
         assert len(message.send_webapi.call_args_list) == 1
         args, kwargs = message.send_webapi.call_args_list[0]
         assert args[0] is ''
-        assert json.loads(args[1]) == testdata['result']
+        assert json.loads(kwargs['attachments']) == testdata['result']
+        if thread_ts is not None:
+            assert kwargs['thread_ts'] == thread_ts
 
 
 @pytest.mark.parametrize('input,testdata', [
@@ -111,7 +116,7 @@ def test_wrong_auth(bot):
         assert len(message.send_webapi.call_args_list) == 1
         args, kwargs = message.send_webapi.call_args_list[0]
         assert args[0] is ''
-        assert json.loads(args[1]) == [{
+        assert json.loads(kwargs['attachments']) == [{
                 'color': 'danger',
                 'fallback': 'Jira authentication error',
                 'text': ':exclamation: Jira authentication error'}]

@@ -63,7 +63,7 @@ def test_display_reviews(bot, input, testdata):
         assert len(message.send_webapi.call_args_list) == 1
         args, kwargs = message.send_webapi.call_args_list[0]
         assert args[0] is ''
-        assert json.loads(args[1]) == testdata['result']
+        assert json.loads(kwargs['attachments']) == testdata['result']
 
 
 @pytest.mark.parametrize('input,testdata', [

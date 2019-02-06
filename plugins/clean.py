@@ -34,7 +34,7 @@ class CleanBot(object):
 
     def generate_clean_tasks(self, message, key):
         key = key.upper()
-        message.send_webapi('Yes my lord. I\'m looking for tasks...')
+        message.reply_webapi('Yes my lord. I\'m looking for tasks...')
         self.__pending_actions.pop(message._get_user_id(), None)
 
         username = self._get_username(message)
@@ -52,7 +52,7 @@ class CleanBot(object):
         for result in results:
             has_error |= result.has_error
 
-        message.send_webapi('', attachments=json.dumps(messages))
+        message.reply_webapi('', attachments=json.dumps(messages))
         if has_error:
             message.reply_webapi('There are errors. Clean cannot be performed')
         else:

@@ -51,7 +51,7 @@ class CrucibleBot(object):
 
                     raise
             if attachments:
-                message.send_webapi('', json.dumps(attachments))
+                message.reply_webapi('', json.dumps(attachments))
 
     def get_reviews_from_jira(self, jirakey):
         request = rest.get(
