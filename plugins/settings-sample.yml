@@ -19,6 +19,9 @@ plugins:
   cruciblebot:
     enabled: No
     prefixes: [ REVIEWKEY1, REVIEWKEY2 ]
+    # If some users have a different user name in Slack and Crucible, you can create a Custom Field in the Slack Profile so they can put their Crucible user name there.
+    # Once you have done so, you need to peek at the user dictionary returned by the Slack API to get the field ID and specify it here. Otherwise, remove this here.
+    handlefield: FIELDID
 
   cleanbot:
     enabled: No
