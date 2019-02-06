@@ -68,7 +68,7 @@ class NotifierJob(object):
                 .submit(self._run) \
                 .add_done_callback(self.__run_async)
         except RuntimeError as ex:
-            logger.warn('Unable to run task: %s', ex, exc_info=True)
+            logger.warning('Unable to run task: %s', ex, exc_info=True)
 
     def _init_threaded(self, executor, slackclient):
         self.__executor = executor
