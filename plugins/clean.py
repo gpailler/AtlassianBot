@@ -15,6 +15,7 @@ from . import bamboo
 from . import stash
 from . import settings
 
+from utils.slackbot_utils import send_message
 
 class CleanBot(object):
     PENDING_ACTIONS_VALIDITY = 30  # seconds
@@ -34,7 +35,7 @@ class CleanBot(object):
 
     def generate_clean_tasks(self, message, key):
         key = key.upper()
-        message.reply_webapi('Yes my lord. I\'m looking for tasks...')
+        send_message(message, 'Yes my lord. I\'m looking for tasks...')
         self.__pending_actions.pop(message._get_user_id(), None)
 
         username = self._get_username(message)
@@ -52,14 +53,13 @@ class CleanBot(object):
         for result in results:
             has_error |= result.has_error
 
-        message.reply_webapi('', attachments=json.dumps(messages))
+        send_message(message, '', attachments=json.dumps(messages))
         if has_error:
-            message.reply_webapi('There are errors. Clean cannot be performed')
+            send_message(message, 'There are errors. Clean cannot be performed')
         else:
             actions = [y for x in results for y in x.actions]
             if len(actions) > 0:
-                message.reply_webapi(
-                    'Send \'CLEAN YES\' to validate these changes')
+                send_message(message, 'Send \'CLEAN YES\' to validate these changes')
 
                 self.__pending_actions[message._get_user_id()] = {
                     'date': datetime.utcnow(),
@@ -67,7 +67,7 @@ class CleanBot(object):
                     'actions': actions
                 }
             else:
-                message.reply_webapi('Nothing to clean')
+                send_message(message, 'Nothing to clean')
 
     def execute_clean_tasks(self, message):
         allowed = False
@@ -78,25 +78,25 @@ class CleanBot(object):
                 break
 
         if allowed is False:
-            message.reply_webapi('You\'re not authorized for this action')
+            send_message(message, 'You\'re not authorized for this action')
             return
 
         result = self.__pending_actions.get(message._get_user_id(), None)
         if result:
             delta = timedelta(seconds=self.PENDING_ACTIONS_VALIDITY)
             if result['date'] + delta < datetime.utcnow():
-                message.reply_webapi(
+                send_message(message,
                     ('Pending action for {} is not valid anymore.'
                      'You have {} seconds to validate the action.')
                     .format(result['key'], self.PENDING_ACTIONS_VALIDITY))
             else:
-                message.reply_webapi('Yes my lord. I\'m on it.')
+                send_message(message, 'Yes my lord. I\'m on it.')
                 for action in result['actions']:
                     action()
 
-                message.reply_webapi('I\'m done!')
+                send_message(message, 'I\'m done!')
         else:
-            message.reply_webapi('No pending action found')
+            send_message(message, 'No pending action found')
 
     def __search_jira(self, key, username):
         result = SearchResult('JIRA')

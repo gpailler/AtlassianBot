@@ -8,6 +8,7 @@ from slackbot.bot import respond_to
 
 from . import settings
 from utils import rest
+from utils.slackbot_utils import send_message
 
 logger = logging.getLogger(__name__)
 
@@ -27,22 +28,22 @@ class BambooBot(object):
     def move_deployment(self, message, deploymentid):
         key = self.__get_deployment_key(deploymentid)
         if key is None:
-            message.reply_webapi('Deployment {} doesn\'t exists'.format(deploymentid))
+            send_message(message, 'Deployment {} doesn\'t exists'.format(deploymentid))
             return
         else:
-            message.reply_webapi('Yes my lord. I\'m looking for deployment plan to move...')
+            send_message(message, 'Yes my lord. I\'m looking for deployment plan to move...')
             moved = self.__move_top(key, 'DEPLOYMENT')
             if moved:
-                message.reply_webapi('Moved deployment {}'.format(deploymentid))
+                send_message(message, 'Moved deployment {}'.format(deploymentid))
             else:
-                message.reply_webapi('Unable to move deployment {} '.format(deploymentid))
+                send_message(message, 'Unable to move deployment {} '.format(deploymentid))
 
     def move_plan(self, message, plankey):
         if self.__plan_exist(plankey) is False:
-            message.reply_webapi('Plan {} doesn\'t exists'.format(plankey))
+            send_message(message, 'Plan {} doesn\'t exists'.format(plankey))
             return
 
-        message.reply_webapi('Yes my lord. I\'m looking for jobs to move...')
+        send_message(message, 'Yes my lord. I\'m looking for jobs to move...')
 
         builds = self.__get_builds()
         if builds is not None:
@@ -51,13 +52,11 @@ class BambooBot(object):
                 for resultkey, index in resultkeys[::-1]:
                     self.__move_top(resultkey, 'BUILD')
 
-                message.reply_webapi('Moved {} jobs'.format(len(resultkeys)))
+                send_message(message, 'Moved {} jobs'.format(len(resultkeys)))
             else:
-                message.reply_webapi('Plan {} not found in queue'
-                                     .format(plankey))
+                send_message(message, 'Plan {} not found in queue'.format(plankey))
         else:
-            message.reply_webapi(
-                'I\'m not a Bamboo administrator and cannot move jobs')
+            send_message(message, 'I\'m not a Bamboo administrator and cannot move jobs')
 
     def __move_top(self, resultkey, type):
         request = rest.post(

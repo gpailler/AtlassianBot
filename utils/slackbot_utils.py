@@ -17,3 +17,9 @@ def get_user_by_crucible_handle(slack_client, username, field_code):
                 return userid
         except:
             pass
+
+def send_message(message, text, attachments=None):
+    if 'thread_ts' in message.body:
+        message.send_webapi(text, attachments=attachments, as_user=True, thread_ts=message.thread_ts)
+    else:
+        message.send_webapi(text, attachments=attachments, as_user=True, thread_ts=None)

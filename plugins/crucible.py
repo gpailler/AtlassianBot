@@ -9,6 +9,7 @@ from slackbot.bot import listen_to
 from slackbot.bot import respond_to
 
 from utils import slackbot_utils
+from utils.slackbot_utils import send_message
 from . import settings
 from utils import rest
 from utils.messages_cache import MessagesCache
@@ -51,7 +52,7 @@ class CrucibleBot(object):
 
                     raise
             if attachments:
-                message.reply_webapi('', json.dumps(attachments))
+                send_message(message, '', json.dumps(attachments))
 
     def get_reviews_from_jira(self, jirakey):
         request = rest.get(

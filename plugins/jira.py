@@ -17,6 +17,7 @@ from . import settings
 from utils.messages_cache import MessagesCache
 from utils.imageproxy import converturl_proxyurl
 from utils.notifier_bot import NotifierBot, NotifierJob
+from utils.slackbot_utils import send_message
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ class JiraBot(object):
             attachments.append(issue_message)
 
         if attachments:
-            message.reply_webapi('', json.dumps(attachments))
+            send_message(message, '', json.dumps(attachments))
 
     def get_issue_message(self, key):
         try:
